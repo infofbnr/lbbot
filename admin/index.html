@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patchnotes Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans">
+<header class="bg-gray-800 p-6 text-center text-3xl font-bold text-blue-400">Patchnotes Admin</header>
+
+<main class="max-w-3xl mx-auto mt-10 px-4 space-y-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-md space-y-4">
+    <h2 class="text-xl font-semibold text-yellow-400">Add Patchnote</h2>
+    <input id="version" type="text" placeholder="v2.5.0" class="w-full p-2 rounded bg-gray-700 mb-2">
+    <input id="date" type="date" class="w-full p-2 rounded mb-2 bg-gray-700">
+    <input id="categories" type="text" placeholder="Feature,Bugfix,UI" class="w-full p-2 rounded mb-2 bg-gray-700">
+    <textarea id="changes" rows="5" placeholder="Change 1&#10;Change 2" class="w-full p-2 rounded bg-gray-700 mb-2"></textarea>
+    <button id="addBtn" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white font-semibold">Add Patchnote</button>
+  </div>
+
+  <div class="bg-gray-800 p-6 rounded-lg shadow-md space-y-4">
+    <h2 class="text-xl font-semibold text-yellow-400">Existing Patchnotes</h2>
+    <ul id="patchnoteList" class="space-y-2"></ul>
+  </div>
+</main>
+
+<script type="module">
+import { fetchPatchnotes, addPatchnote, deletePatchnote } from '../script.js';
+
+const listEl = document.getElementById('patchnoteList');
+const versionInput = document.getElementById('version');
+const dateInput = document.getElementById('date');
+const categoriesInput = document.getElementById('categories');
+const changesInput = document.getElementById('changes');
+const addBtn = document.getElementById('addBtn');
+
+async function loadPatchnotes() {
+  listEl.innerHTML = '';
+  const patchnotes = await fetchPatchnotes();
+  patchnotes.forEach(note => {
+    const li = document.createElement('li');
+    li.className = "bg-gray-700 p-3 rounded flex justify-between items-center";
+    li.innerHTML = `<div><strong>${note.version}</strong> - ${note.date} | ${note.categories.join(', ')} | ${note.changes.join(' | ')}</div>`;
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '🗑️';
+    delBtn.className = 'ml-4 hover:text-red-500';
+    delBtn.onclick = async () => { await deletePatchnote(note.id); loadPatchnotes(); };
+    li.appendChild(delBtn);
+    listEl.appendChild(li);
+  });
+}
+
+addBtn.onclick = async () => {
+  const version = versionInput.value.trim();
+  const date = dateInput.value;
+  const categories = categoriesInput.value.split(',').map(c => c.trim()).filter(Boolean);
+  const changes = changesInput.value.split('\n').map(c => c.trim()).filter(Boolean);
+  if (!version || !date || !categories.length || !changes.length) return alert("Fill all fields!");
+  await addPatchnote(version, date, categories, changes);
+  versionInput.value = '';
+  dateInput.value = '';
+  categoriesInput.value = '';
+  changesInput.value = '';
+  loadPatchnotes();
+}
+
+window.onload = loadPatchnotes;
+</script>
+</body>
+</html>

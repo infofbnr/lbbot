@@ -1,7 +1,7 @@
-// patchnotes.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
-// TODO: Replace with your Firebase config
+
+// Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCHYnW3qaNo7oGKMPs9DFALdWXIeYv6ixY",
   authDomain: "gossip-38bf8.firebaseapp.com",
@@ -15,17 +15,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-// Utility functions
+// --- Fetch all patchnotes ---
 export async function fetchPatchnotes(orderByField = "date", desc = true) {
   const q = query(collection(db, "patchnotes"), orderBy(orderByField, desc ? "desc" : "asc"));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function addPatchnote(version, date, categories, changes) {
+// --- Add a new patchnote ---
+export async function savePatchnote({ version, date, categories, changes }) {
   await addDoc(collection(db, "patchnotes"), { version, date, categories, changes });
 }
 
+// --- Delete a patchnote ---
 export async function deletePatchnote(id) {
   await deleteDoc(doc(db, "patchnotes", id));
 }

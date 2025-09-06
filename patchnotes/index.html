@@ -46,11 +46,7 @@ async function loadPatchnotes() {
   const patchnotes = await fetchPatchnotes();
 
   // Ask for admin password (only once)
-  const admin = localStorage.getItem("adminPass");
-  let f = false;
-  if (admin) {
-    f = true;
-  }
+  const admin = isAdmin();
 
   // Check for hash in URL (like #patch-xyz)
   const hash = window.location.hash;
@@ -60,7 +56,7 @@ async function loadPatchnotes() {
 
     if (note) {
       // Render only this single patchnote
-      renderPatchnotes(container, [note], f);
+      renderPatchnotes(container, [note], admin);
 
       // Highlight it
       const el = document.getElementById(`patch-${note.id}`);
@@ -72,7 +68,7 @@ async function loadPatchnotes() {
   }
 
   // Otherwise render all patchnotes
-  renderPatchnotes(container, patchnotes, f);
+  renderPatchnotes(container, patchnotes, admin);
 }
 
 window.onload = loadPatchnotes;

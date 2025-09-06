@@ -1,4 +1,4 @@
-import { addPatchnote } from '../patchnotes.js';
+import { addPatchnote } from '../patchnotes/patchnotes.js';
 
 const ADMIN_PASSWORD = 'manoonly';
 

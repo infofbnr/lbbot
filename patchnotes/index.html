@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LB Bot</title>
+<link rel="icon" href="../picture/lbbot.jpg">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans">
+    <div class="flex justify-center mt-8">
+    <img src="../picture/lbbot.jpg" alt="LB Bot" class="w-36 h-36 rounded-full shadow-xl border-4 border-teal-500">
+  </div>
+<header class="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-center text-4xl font-extrabold text-white drop-shadow-lg">
+  LB Bot Patchnotes
+</header>
+
+<main class="max-w-3xl mx-auto mt-10 px-4" id="patchnotesContainer"></main>
+
+<script type="module">
+import { fetchPatchnotes } from './patchnotes.js';
+import { renderPatchnotes } from './script.js';
+
+const ADMIN_PASSWORD = 'manoonly';
+function isAdmin() {
+  return localStorage.getItem('adminPass') === ADMIN_PASSWORD;
+}
+function checkAdmin() {
+  if (!isAdmin()) {
+    const input = prompt("Enter admin password (or press Cancel for read-only):");
+    if (input === ADMIN_PASSWORD) {
+      localStorage.setItem('adminPass', ADMIN_PASSWORD);
+      return true;
+    }
+    return false;
+  }
+  return true;
+}
+
+// --- Disable right-click, F12, Ctrl+Shift+I, Ctrl+U ---
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' || 
+    (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase())) || 
+    (e.ctrlKey && e.key.toLowerCase() === 'u')
+  ) {
+    e.preventDefault();
+    alert("⚠️ This action is disabled.");
+  }
+});
+
+
+async function loadPatchnotes() {
+  const container = document.getElementById('patchnotesContainer');
+  const patchnotes = await fetchPatchnotes();
+
+  // Ask for admin password (only once)
+  const admin = checkAdmin();
+
+  // Check for hash in URL (like #patch-xyz)
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#patch-')) {
+    const patchId = hash.replace('#patch-', '');
+    const note = patchnotes.find(p => p.id == patchId);
+
+    if (note) {
+      // Render only this single patchnote
+      renderPatchnotes(container, [note], admin);
+
+      // Highlight it
+      const el = document.getElementById(`patch-${note.id}`);
+      if (el) {
+        el.classList.add("ring-4", "ring-yellow-400");
+      }
+      return;
+    }
+  }
+
+  // Otherwise render all patchnotes
+  renderPatchnotes(container, patchnotes, admin);
+}
+
+window.onload = loadPatchnotes;
+</script>
+
+
+
+</body>
+</html>

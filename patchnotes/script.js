@@ -30,7 +30,8 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
       <ul class="list-disc list-inside space-y-1 text-gray-100">
         ${note.changes.map(c => `<li>${escapeHTML(c)}</li>`).join('')}
       </ul>
-      <button class="shareBtn mt-4 bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-full text-white font-semibold shadow-md hover:shadow-lg transition">
+      <button class="shareBtn mt-4 bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-full text-white font-semibold shadow-md hover:shadow-lg transition"
+        data-url="${patchUrl}" data-version="${escapeHTML(note.version)}">
         Share
       </button>
     `;

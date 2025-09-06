@@ -184,3 +184,14 @@ searchInput.addEventListener("input", (e) => {
   );
   renderCommandsByCategory(filtered);
 });
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' || 
+    (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase())) || 
+    (e.ctrlKey && e.key.toLowerCase() === 'u')
+  ) {
+    e.preventDefault();
+    alert("⚠️ This action is disabled.");
+  }
+});

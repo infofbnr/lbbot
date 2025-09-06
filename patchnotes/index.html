@@ -25,17 +25,7 @@ const ADMIN_PASSWORD = 'manoonly';
 function isAdmin() {
   return localStorage.getItem('adminPass') === ADMIN_PASSWORD;
 }
-function checkAdmin() {
-  if (!isAdmin()) {
-    const input = prompt("Enter admin password (or press Cancel for read-only):");
-    if (input === ADMIN_PASSWORD) {
-      localStorage.setItem('adminPass', ADMIN_PASSWORD);
-      return true;
-    }
-    return false;
-  }
-  return true;
-}
+
 
 // --- Disable right-click, F12, Ctrl+Shift+I, Ctrl+U ---
 document.addEventListener('contextmenu', e => e.preventDefault());

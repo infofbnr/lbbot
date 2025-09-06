@@ -23,7 +23,7 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-2xl font-extrabold text-white">v${escapeHTML(note.version)} - ${escapeHTML(note.date)}</h2>
         ${isAdmin ? `<button class="deleteBtn" data-id="${note.id}">
-          <img src="/picture/delete.png" alt="delete" class="w-6 h-6 hover:opacity-80">
+          <img src="../picture/delete.png" alt="delete" class="w-6 h-6 hover:opacity-80">
         </button>` : ""}
       </div>
       <p class="text-teal-300 italic mb-3">${note.categories.map(c => escapeHTML(c)).join(', ')}</p>

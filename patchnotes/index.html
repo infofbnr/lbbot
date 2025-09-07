@@ -39,21 +39,16 @@ async function loadPatchnotes() {
   // Check for hash in URL (like #patch-xyz)
   const hash = window.location.hash;
   if (hash && hash.startsWith('#patch-')) {
-    const patchId = hash.replace('#patch-', '');
-    const note = patchnotes.find(p => p.id == patchId);
-
+    const version = hash.replace('#patch-', ''); // use version as identifier
+    const note = patchnotes.find(p => p.version === version); // find by version
     if (note) {
-      // Render only this single patchnote
       renderPatchnotes(container, [note], admin);
-
-      // Highlight it
-      const el = document.getElementById(`patch-${note.id}`);
-      if (el) {
-        el.classList.add("ring-4", "ring-yellow-400");
-      }
+      const el = document.getElementById(`patch-${note.version}`);
+      if (el) el.classList.add("ring-4", "ring-yellow-400");
       return;
     }
   }
+
 
   // Otherwise render all patchnotes
   renderPatchnotes(container, patchnotes, admin);

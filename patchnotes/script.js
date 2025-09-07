@@ -65,9 +65,8 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
   // Share button listeners
   container.querySelectorAll('.shareBtn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const url = btn.dataset.url;
       const version = btn.dataset.version;
-      const text = `Check out patchnote ${version}: ${url}`;
+      const text = `Check out patchnote ${version}: ${window.location.origin}/patchnotes/#patch-${version}`;
       try {
         await navigator.clipboard.writeText(text);
         alert("📋 Patchnote link copied to clipboard!");
@@ -76,6 +75,9 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
       }
     });
   });
+
+
+
 
   // Delete button listeners (only if admin)
   if (isAdmin) {

@@ -30,7 +30,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     const [category, ...rest] = line.split(":");
     return {
       category: category ? category.trim() : "Other",
-      text: rest.length ? rest.join(":").trim() : ""
+      text: rest.length ? rest.join(":").trim() : line.trim() // fallback to full line
     };
   }).filter(c => c.text.length > 0);
 

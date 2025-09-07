@@ -18,16 +18,19 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
 // Fetch all patchnotes, ordered by a field (default: date descending)
-export async function fetchPatchnotes(orderByField = "date", desc = true) {
+export async function fetchPatchnotes(orderByField = "version", desc = true) {
   const q = query(collection(db, "patchnotes"), orderBy(orderByField, desc ? "desc" : "asc"));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 // Add a patchnote
+// Add a patchnote (each change has a category and text)
 export async function addPatchnote(version, date, categories, changes) {
+  // changes should be an array of objects: { category: "Fix", text: "Fixed crash" }
   await addDoc(collection(db, "patchnotes"), { version, date, categories, changes });
 }
+
 
 // Delete a patchnote by ID
 export async function deletePatchnote(id) {

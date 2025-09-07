@@ -21,21 +21,33 @@ if (checkPassword()) {
 }
 
 document.getElementById('saveBtn').addEventListener('click', async () => {
-  const version = document.getElementById('version').value.trim();
-  const date = document.getElementById('date').value;
-  const categories = document.getElementById('categories').value.split(',').map(c => c.trim()).filter(Boolean);
-  const changes = document.getElementById('changes').value.split('\n').map(c => c.trim()).filter(Boolean);
+  const version = document.getElementById("version").value.trim();
+  const date = document.getElementById("date").value;
 
-  if (!version || !date || !changes.length) {
-    alert("Please fill out all fields!");
+  const rawChanges = document.getElementById("changes").value.trim().split("\n");
+
+  const changes = rawChanges.map(line => {
+    const [category, ...rest] = line.split(":");
+    return {
+      category: category ? category.trim() : "Other",
+      text: rest.length ? rest.join(":").trim() : ""
+    };
+  }).filter(c => c.text.length > 0);
+
+  if (!version || !date || changes.length === 0) {
+    alert("❌ Please fill out all fields!");
     return;
   }
 
+  const categories = document.getElementById("categories").value.split(',')
+    .map(c => c.trim()).filter(Boolean);
+
   await addPatchnote(version, date, categories, changes);
+
   alert("✅ Patchnote saved!");
 
-  document.getElementById('version').value = '';
-  document.getElementById('date').value = '';
-  document.getElementById('categories').value = '';
-  document.getElementById('changes').value = '';
+  document.getElementById("version").value = '';
+  document.getElementById("date").value = '';
+  document.getElementById("categories").value = '';
+  document.getElementById("changes").value = '';
 });

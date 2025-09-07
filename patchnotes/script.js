@@ -1,6 +1,7 @@
 import { deletePatchnote } from './patchnotes.js';
 
 function escapeHTML(str) {
+  if (!str) str = ""; // default to empty string if undefined/null
   return str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -19,6 +20,27 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
 
     const patchUrl = `${window.location.origin}${window.location.pathname}#patch-${note.id}`;
 
+    // Render changes with color per category
+    const changeList = note.changes.map(change => {
+      let colorClass = "text-gray-200"; // default
+      if (/fix/i.test(change.category)) colorClass = "text-red-400";
+      else if (/feature/i.test(change.category)) colorClass = "text-green-400";
+      else if (/change/i.test(change.category)) colorClass = "text-yellow-400";
+      else if (/remove/i.test(change.category)) colorClass = "text-purple-400";
+
+      return `
+        <li class="${colorClass}">
+          <span class="font-semibold">[${escapeHTML(change.category)}]</span> 
+          ${escapeHTML(change.text)}
+        </li>
+      `;
+    }).join('');
+
+    // Render categories at the top of the patchnote
+    const categoriesHTML = note.categories && note.categories.length
+      ? `<p class="text-teal-300 italic mb-3">${note.categories.map(c => escapeHTML(c)).join(', ')}</p>`
+      : '';
+
     div.innerHTML = `
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-2xl font-extrabold text-white">v${escapeHTML(note.version)} - ${escapeHTML(note.date)}</h2>
@@ -26,9 +48,9 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
           <img src="../picture/delete.png" alt="delete" class="w-6 h-6 hover:opacity-80">
         </button>` : ""}
       </div>
-      <p class="text-teal-300 italic mb-3">${note.categories.map(c => escapeHTML(c)).join(', ')}</p>
-      <ul class="list-disc list-inside space-y-1 text-gray-100">
-        ${note.changes.map(c => `<li>${escapeHTML(c)}</li>`).join('')}
+      ${categoriesHTML}
+      <ul class="list-disc list-inside space-y-1">
+        ${changeList}
       </ul>
       <button class="shareBtn mt-4 bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-full text-white font-semibold shadow-md hover:shadow-lg transition"
         data-url="${patchUrl}" data-version="${escapeHTML(note.version)}">
@@ -46,12 +68,10 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
       const url = btn.dataset.url;
       const version = btn.dataset.version;
       const text = `Check out patchnote ${version}: ${url}`;
-
       try {
         await navigator.clipboard.writeText(text);
         alert("📋 Patchnote link copied to clipboard!");
-      } catch (err) {
-        console.error("Clipboard copy failed", err);
+      } catch {
         prompt("Copy this link:", text);
       }
     });

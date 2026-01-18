@@ -113,6 +113,18 @@ const commands = [
   { "name": "!guess age [name]", "category": "Random", "description": "Get an age for that name." },
   { "name": "!guess gender [name]", "category": "Random", "description": "Get a gender for that name." },
   { "name": "!guess ethnicity [name]", "category": "Random", "description": "Get an ethnicity for that name." },
+  { "name": "!calc [expression]", "category": "Random", "description": "Calculate a mathematical expression." },
+  { "name": "!reverse [text]", "category": "Random", "description": "Reverse the given text." },
+  { "name": "!mock [text]", "category": "Random", "description": "Get the mocked version of the text." },
+  { "name": "!wanted [@user/reply to msg]", "category": "Random", "description": "Get a wanted poster of the user." },
+  { "name": "!jail [@user/reply to msg]", "category": "Random", "description": "Get a jail image of the user." },
+  { "name": "!pet <@user/reply to msg>", "category": "Random", "description": "Get a pet image of the user." },
+  
+
+  { "name": "!birthdays", "category": "Birthday", "description": "See all birthdays for today."},
+  { "name": "!setbirthday YYYY-MM-DD", "category": "Birthday", "description": "Set your birthday."},,
+  { "name": "!mybirthday", "category": "Birthday", "description": "See your set birthday."},
+  { "name": "!birthdaylist", "category": "Birthday", "description": "See a list of all saved birthdays."},
 
   { "name": "!rank <@user/reply to msg>", "category": "Levels", "description": "Check eithr your or someone else's rank."},
   { "name": "!ranklb", "category": "Levels", "description": "See the top 10 most active users in a group."}

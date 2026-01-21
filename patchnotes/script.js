@@ -1,8 +1,8 @@
 import { deletePatchnote } from './patchnotes.js';
 
 // Prevent HTML injection
-function escapeHTML(str = "") {
-  return str
+function escapeHTML(str) {
+  return String(str ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");

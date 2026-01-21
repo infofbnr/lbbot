@@ -1,8 +1,16 @@
-// Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
 
-// Replace with your Firebase config
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCHYnW3qaNo7oGKMPs9DFALdWXIeYv6ixY",
   authDomain: "gossip-38bf8.firebaseapp.com",
@@ -13,26 +21,32 @@ const firebaseConfig = {
   measurementId: "G-N7S9894R3N"
 };
 
-// Initialize Firebase
+// Init Firebase
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-// Fetch all patchnotes, ordered by a field (default: date descending)
+// Fetch patchnotes
 export async function fetchPatchnotes(orderByField = "version", desc = true) {
-  const q = query(collection(db, "patchnotes"), orderBy(orderByField, desc ? "desc" : "asc"));
+  const q = query(
+    collection(db, "patchnotes"),
+    orderBy(orderByField, desc ? "desc" : "asc")
+  );
+
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// Add a patchnote
-// Add a patchnote (each change has a category and text)
+// Add a new patchnote
 export async function addPatchnote(version, date, categories, changes) {
-  // changes should be an array of objects: { category: "Fix", text: "Fixed crash" }
-  await addDoc(collection(db, "patchnotes"), { version, date, categories, changes });
+  return addDoc(collection(db, "patchnotes"), {
+    version,
+    date,
+    categories,
+    changes
+  });
 }
 
-
-// Delete a patchnote by ID
+// Delete patchnote
 export async function deletePatchnote(id) {
-  await deleteDoc(doc(db, "patchnotes", id));
+  return deleteDoc(doc(db, "patchnotes", id));
 }

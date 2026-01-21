@@ -1,63 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LB Bot</title>
-<link rel="icon" href="../picture/lbbot.jpg">
-<script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LB Bot Patchnotes</title>
+  <link rel="icon" href="../picture/lbbot.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-900 text-gray-100 font-sans">
-    <div class="flex justify-center mt-8">
-    <img src="../picture/lbbot.jpg" alt="LB Bot" class="w-36 h-36 rounded-full shadow-xl border-4 border-teal-500">
+
+  <!-- Logo -->
+  <div class="flex justify-center mt-8">
+    <img
+      src="../picture/lbbot.jpg"
+      alt="LB Bot"
+      class="w-36 h-36 rounded-full shadow-xl border-4 border-teal-500"
+    >
   </div>
-<header class="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-center text-4xl font-extrabold text-white drop-shadow-lg">
-  LB Bot Patchnotes
-</header>
 
-<main class="max-w-3xl mx-auto mt-10 px-4" id="patchnotesContainer"></main>
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-center text-4xl font-extrabold text-white drop-shadow-lg">
+    LB Bot Patchnotes
+  </header>
 
-<script type="module">
-import { fetchPatchnotes } from './patchnotes.js';
-import { renderPatchnotes } from './script.js';
+  <!-- Patchnotes -->
+  <main
+    id="patchnotesContainer"
+    class="max-w-3xl mx-auto mt-10 px-4"
+  ></main>
 
-const ADMIN_PASSWORD = 'manoonly';
-function isAdmin() {
-  return localStorage.getItem('adminPass') === ADMIN_PASSWORD;
-}
+  <!-- Logic -->
+  <script type="module">
+    import { fetchPatchnotes } from './patchnotes.js';
+    import { renderPatchnotes } from './script.js';
 
+    const ADMIN_PASSWORD = 'manoonly';
 
-
-
-async function loadPatchnotes() {
-  const container = document.getElementById('patchnotesContainer');
-  const patchnotes = await fetchPatchnotes();
-
-  // Ask for admin password (only once)
-  const admin = isAdmin();
-
-  // Check for hash in URL (like #patch-xyz)
-  const hash = window.location.hash;
-  if (hash && hash.startsWith('#patch-')) {
-    const version = hash.replace('#patch-', ''); // use version as identifier
-    const note = patchnotes.find(p => p.version === version); // find by version
-    if (note) {
-      renderPatchnotes(container, [note], admin);
-      const el = document.getElementById(`patch-${note.version}`);
-      if (el) el.classList.add("ring-4", "ring-yellow-400");
-      return;
+    function isAdmin() {
+      return localStorage.getItem('adminPass') === ADMIN_PASSWORD;
     }
-  }
 
+    async function loadPatchnotes() {
+      const container = document.getElementById('patchnotesContainer');
+      const patchnotes = await fetchPatchnotes();
+      const admin = isAdmin();
 
-  // Otherwise render all patchnotes
-  renderPatchnotes(container, patchnotes, admin);
-}
+      // Handle direct patch links (#patch-x)
+      const hash = window.location.hash;
+      if (hash.startsWith('#patch-')) {
+        const version = hash.replace('#patch-', '');
+        const note = patchnotes.find(p => p.version === version);
 
-window.onload = loadPatchnotes;
-</script>
+        if (note) {
+          renderPatchnotes(container, [note], admin);
+          document
+            .getElementById(`patch-${note.id}`)
+            ?.classList.add("ring-4", "ring-yellow-400");
+          return;
+        }
+      }
 
+      // Default: render all
+      renderPatchnotes(container, patchnotes, admin);
+    }
 
+    window.addEventListener('load', loadPatchnotes);
+  </script>
 
 </body>
 </html>

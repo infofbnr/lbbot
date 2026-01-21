@@ -29,8 +29,6 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
       hover:shadow-2xl hover:-translate-y-1 transition
     `;
 
-    const patchUrl = `${location.origin}${location.pathname}#patch-${note.id}`;
-
     const changesHTML = note.changes.map(change => `
       <li class="${getCategoryColor(change.category)}">
         <span class="font-semibold">
@@ -72,7 +70,7 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
       <button
         class="shareBtn mt-4 bg-teal-500 hover:bg-teal-600
                px-4 py-2 rounded-full font-semibold shadow-md transition"
-        data-version="${escapeHTML(note.version)}"
+        data-id="${note.id}"
       >
         Share
       </button>
@@ -81,11 +79,11 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
     container.appendChild(card);
   });
 
-  // Share buttons
+  // Share buttons (FIXED)
   container.querySelectorAll(".shareBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const version = btn.dataset.version;
-      const text = `Check out patchnote ${version}: ${location.origin}/patchnotes/#patch-${version}`;
+      const id = btn.dataset.id;
+      const text = `Check out this patchnote: ${location.origin}/patchnotes/#patch-${id}`;
 
       try {
         await navigator.clipboard.writeText(text);

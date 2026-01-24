@@ -74,6 +74,14 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
       >
         Share
       </button>
+      <button
+        class="mt-6 bg-purple-600 hover:bg-purple-700
+              px-6 py-3 rounded-full font-bold shadow-lg transition"
+        onclick='generateShareImage(${JSON.stringify(note)})'
+      >
+        🖼 Share as Image
+      </button>
+
     `;
 
     container.appendChild(card);
@@ -105,3 +113,38 @@ export function renderPatchnotes(container, patchnotes, isAdmin = false) {
     });
   }
 }
+window.generateShareImage = function (note) {
+  const card = document.getElementById("shareCard");
+  const versionEl = document.getElementById("shareVersion");
+  const changesEl = document.getElementById("shareChanges");
+
+  versionEl.textContent = `v${note.version}`;
+
+  const emoji = {
+    Fix: "🐞",
+    Feature: "✨",
+    Change: "⚡",
+    Remove: "🗑️"
+  };
+
+  const highlights = (note.changes ?? [])
+    .filter(c => /fix|feature|change/i.test(c.category))
+    .slice(0, 4);
+
+  changesEl.innerHTML = highlights.map(c => `
+    <div>
+      ${emoji[c.category] ?? "•"} ${c.text}
+    </div>
+  `).join("");
+
+  html2canvas(card, {
+    scale: 2,
+    backgroundColor: null
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `lbbot-v${note.version}.png`;
+    link.click();
+  });
+};
+

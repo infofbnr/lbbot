@@ -127,24 +127,57 @@ window.generateShareImage = function (note) {
     Remove: "🗑️"
   };
 
-  const highlights = (note.changes ?? [])
-    .filter(c => /fix|feature|change/i.test(c.category))
-    .slice(0, 4);
+  const allChanges = note.changes ?? [];
+  const count = allChanges.length;
 
-  changesEl.innerHTML = highlights.map(c => `
-    <div>
+  // 🔹 RESET styles
+  changesEl.className =
+    "mt-12 font-medium leading-snug grid gap-x-10 gap-y-4";
+
+  // 🔹 Layout rules
+  if (count > 14) {
+    // BIG patchnotes → 2 columns, small text
+    changesEl.classList.add("grid-cols-2", "text-xl");
+  } else if (count > 8) {
+    // Medium-long → 2 columns, medium text
+    changesEl.classList.add("grid-cols-2", "text-2xl");
+  } else {
+    // Short → 1 column, large text
+    changesEl.classList.add("grid-cols-1", "text-3xl");
+  }
+
+  // 🔹 Render ALL changes
+  changesEl.innerHTML = allChanges.map(c => `
+    <div class="break-words">
       ${emoji[c.category] ?? "•"} ${c.text}
     </div>
   `).join("");
 
-  html2canvas(card, {
-    scale: 2,
-    backgroundColor: null
-  }).then(canvas => {
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png");
-    link.download = `lbbot-v${note.version}.png`;
-    link.click();
+  // 🔹 Last-resort scale if still too tall
+  card.style.transform = "scale(1)";
+  card.style.transformOrigin = "top left";
+
+  requestAnimationFrame(() => {
+    const maxHeight = 1080;
+    const actualHeight = card.scrollHeight;
+
+    if (actualHeight > maxHeight) {
+      const scale = maxHeight / actualHeight;
+      card.style.transform = `scale(${scale})`;
+    }
+
+    html2canvas(card, {
+      scale: 2,
+      backgroundColor: null
+    }).then(canvas => {
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = `lbbot-v${note.version}.png`;
+      link.click();
+
+      // Reset scale after export
+      card.style.transform = "scale(1)";
+    });
   });
 };
 

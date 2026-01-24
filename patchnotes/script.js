@@ -121,39 +121,51 @@ window.generateShareImage = function (note) {
   versionEl.textContent = `v${note.version}`;
 
   const emoji = {
-    Fix: "🐞",
     Feature: "✨",
+    Fix: "🐞",
     Change: "⚡",
-    Remove: "🗑️"
+    Remove: "🗑️",
+    Other: "•"
   };
 
-  const allChanges = note.changes ?? [];
-  const count = allChanges.length;
+  // 🔹 Group changes by category
+  const groups = {};
+  (note.changes ?? []).forEach(c => {
+    const key = c.category || "Other";
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(c.text);
+  });
 
-  // 🔹 RESET styles
+  const totalLines = Object.values(groups).flat().length;
+
+  // 🔹 Reset layout
   changesEl.className =
-    "mt-12 font-medium leading-snug grid gap-x-10 gap-y-4";
+    "mt-12 grid grid-cols-2 gap-x-12 gap-y-8 font-medium leading-snug";
 
-  // 🔹 Layout rules
-  if (count > 14) {
-    // BIG patchnotes → 2 columns, small text
-    changesEl.classList.add("grid-cols-2", "text-xl");
-  } else if (count > 8) {
-    // Medium-long → 2 columns, medium text
-    changesEl.classList.add("grid-cols-2", "text-2xl");
+  // 🔹 Dynamic font sizing
+  if (totalLines > 18) {
+    changesEl.classList.add("text-lg");
+  } else if (totalLines > 12) {
+    changesEl.classList.add("text-xl");
   } else {
-    // Short → 1 column, large text
-    changesEl.classList.add("grid-cols-1", "text-3xl");
+    changesEl.classList.add("text-2xl");
   }
 
-  // 🔹 Render ALL changes
-  changesEl.innerHTML = allChanges.map(c => `
+  // 🔹 Render grouped sections
+  changesEl.innerHTML = Object.entries(groups).map(([category, items]) => `
     <div class="break-words">
-      ${emoji[c.category] ?? "•"} ${c.text}
+      <h3 class="mb-3 font-bold text-purple-400 text-xl">
+        ${emoji[category] ?? "•"} ${category}s
+      </h3>
+      <ul class="space-y-2">
+        ${items.map(text => `
+          <li class="leading-snug">• ${text}</li>
+        `).join("")}
+      </ul>
     </div>
   `).join("");
 
-  // 🔹 Last-resort scale if still too tall
+  // 🔹 GUARANTEED fit (final safety)
   card.style.transform = "scale(1)";
   card.style.transformOrigin = "top left";
 
@@ -175,9 +187,9 @@ window.generateShareImage = function (note) {
       link.download = `lbbot-v${note.version}.png`;
       link.click();
 
-      // Reset scale after export
       card.style.transform = "scale(1)";
     });
   });
 };
+
 
